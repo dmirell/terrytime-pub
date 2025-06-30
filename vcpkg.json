@@ -1,0 +1,21 @@
+{
+  "name": "terry-time",
+  "version-string": "0.0.1",
+  "dependencies": [
+    "boost-serialization",
+    "boost-program-options",
+    "boost-asio",
+    "boost-beast",
+    "boost-callable-traits",
+    "boost-algorithm",
+    "boost-intrusive",
+    "boost-multiprecision",
+    "boost-format",
+    "boost-filesystem",
+    "zlib",
+    "openssl",
+    "spdlog",
+    "gtest",
+    "nlohmann-json"
+  ]
+}

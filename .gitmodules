@@ -1,0 +1,9 @@
+[submodule "ext/binapi"]
+	path = ext/binapi
+	url = git@github.com:dmirell/binapi.git
+	branch = develop
+
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/microsoft/vcpkg
+	branch = master

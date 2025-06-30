@@ -1,0 +1,1 @@
+The capital in [[Quote asset|quote]] currency which going to be used to buy [[base asset]] in [[Full Trading Cycle Model|trading cycle]].

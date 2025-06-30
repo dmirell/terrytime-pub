@@ -1,0 +1,1 @@
+The primary [[asset]] in a trading pair that you are buying or selling (e.g., BTC in BTC/USDT).

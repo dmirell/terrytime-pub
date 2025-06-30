@@ -1,0 +1,25 @@
+{
+  "folder_path": "c:/terrytime/test/data/4/",
+  "terry_path": "D:/Projects/terrytime/build/Debug/terry.exe",
+  "timer": 86300,
+  "symbols": [
+    "DASHBTC",
+    "ETHBTC",
+    "LRCETH",
+    "RVNBTC",
+    "SNTETH",
+    "SNXUSDT",
+    "SOLUSDT",
+    "ADATRY",
+    "CFXBTC",
+    "CRVUSDT",
+    "YFIUSDT",
+    "MINAUSDT",
+    "MULTIUSDT",
+    "OSMOUSDT",
+    "PEOPLEUSDT",
+    "PHBUSDT",
+    "AIUSDT",
+    "EDUTRY"
+  ]
+}

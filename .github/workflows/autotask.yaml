@@ -1,0 +1,139 @@
+name: Auto-Assign and Labels
+
+on:
+  issues:
+    types: [opened, closed]
+
+env:
+  USER: dmirell
+  REPO_NAME: terrytime
+  PROJECT_ID: 1
+  PROJECT_PAT: ${{ secrets.PROJECT_PAT }}
+
+jobs:
+  determine-issue-state:
+    runs-on: ubuntu-latest
+
+    outputs:
+      is_issue_opened: ${{ steps.set-issue-state.outputs.is_issue_opened }}
+      is_issue_closed: ${{ steps.set-issue-state.outputs.is_issue_closed }}
+
+    steps:
+      - name: Set Issue State
+        id: set-issue-state
+        run: |
+          is_issue_opened=false
+          is_issue_closed=false
+
+          # Check if the event is for an opened issue
+          if [[ "${{ github.event_name }}" == 'issues' && "${{ github.event.action }}" == 'opened' ]]; then
+            is_issue_opened=true
+          fi
+
+          # Check if the event is for a closed issue
+          if [[ "${{ github.event_name }}" == 'issues' && "${{ github.event.action }}" == 'closed' ]]; then
+            is_issue_closed=true
+          fi
+
+          # Set the outputs
+          echo "is_issue_opened=$is_issue_opened" >> "$GITHUB_OUTPUT"
+          echo "is_issue_closed=$is_issue_closed" >> "$GITHUB_OUTPUT"
+
+  assignee-and-labels:
+    needs: determine-issue-state
+    runs-on: ubuntu-latest
+    if: needs.determine-issue-state.outputs.is_issue_opened == 'true'
+
+    steps:
+      - uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: "https://github.com/users/${{ env.USER }}/projects/${{ env.PROJECT_ID }}"
+          github-token: ${{ secrets.PROJECT_PAT }}
+        id: add-project
+
+      - name: Set Assignee
+        run: |
+          issue_number=$(jq -r .issue.number $GITHUB_EVENT_PATH)
+          assignee='"assignees":["${{ env.USER }}"]'
+
+          # Perform the GitHub API request for assigning the issue
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.PROJECT_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d "{$assignee}" \
+            "https://api.github.com/repos/${{ env.USER }}/${{ env.REPO_NAME }}/issues/$issue_number"
+
+      - name: Get Repository Labels
+        id: get-repo-labels
+        run: |
+          labels=$(curl -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PROJECT_PAT }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ env.USER }}/${{ env.REPO_NAME }}/labels")
+
+          # Extracting labels
+          labels=$(echo "$labels" | jq -r '.[].name')
+
+          # Extract the issue title
+          issue_title=$(jq -r .issue.title $GITHUB_EVENT_PATH)
+
+          # Convert the JSON array to a Bash array using readarray
+          readarray -t labels_array <<<"$labels"
+          # Loop through keywords and add corresponding labels
+          for keyword in "${labels_array[@]}"; do
+            if [[ $issue_title == *$keyword* ]]; then
+              labels_to_add+="\"$keyword\","
+            fi
+          done
+
+          # Remove trailing comma
+          labels_to_add=$(echo $labels_to_add | sed 's/,$//')
+          echo "labels=\"$labels_to_add\"" >> $GITHUB_ENV
+
+      - name: Set Labels
+        run: |
+          issue_number=$(jq -r .issue.number $GITHUB_EVENT_PATH)
+          labels="${{ env.labels }}"
+          # Add double quotes around each label
+          labels=$(echo $labels | sed 's/\([^,]\+\)/"\1"/g')
+
+          # If labels are found, add labels to the payload
+          if [ -n "$labels" ]; then
+            labels='"labels":['"$labels"']'
+            echo "Set labels:"
+            echo "$labels"
+
+            # Perform the GitHub API request for setting labels
+            curl -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.PROJECT_PAT }}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -d "{$labels}" \
+              "https://api.github.com/repos/${{ env.USER }}/${{ env.REPO_NAME }}/issues/$issue_number/labels" \
+              -v
+          fi
+
+  on_issue_closed:
+    needs: determine-issue-state
+    runs-on: ubuntu-latest
+    if: needs.determine-issue-state.outputs.is_issue_closed == 'true'
+    steps:
+      - uses: actions/add-to-project@v0.5.0 # Just to get itemId in correct format
+        with:
+          project-url: "https://github.com/users/${{ env.USER }}/projects/${{ env.PROJECT_ID }}"
+          github-token: ${{ secrets.PROJECT_PAT }}
+        id: add-project
+
+      - name: Set now date
+        id: script_get_now_date
+        run: |
+          echo "now=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - uses: titoportas/update-project-fields@v0.1.0
+        with:
+          project-url: "https://github.com/users/${{ env.USER }}/projects/${{ env.PROJECT_ID }}"
+          github-token: ${{ secrets.PROJECT_PAT }}
+          item-id: ${{ steps.add-project.outputs.itemId }} # Use the item-id output of the previous step
+          field-keys: closed_at
+          field-values: ${{ steps.script_get_now_date.outputs.now }}

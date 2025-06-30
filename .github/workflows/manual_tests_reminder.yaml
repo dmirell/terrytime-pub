@@ -1,0 +1,36 @@
+name: Auto create an issue
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # at 6:00 each 1st day of month
+
+jobs:
+  create_manually_run_win_tests_issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Create an issue
+        uses: dacbd/create-issue-action@main
+        with:
+          token: ${{ secrets.PROJECT_PAT }}
+          title: "[manually] Run pytest manually"
+          body: |
+            ### Manual execution of pytest is required.
+
+            Use the following commands:
+
+            ```bash
+            pytest ./integration/ -v --terry-path ./build/terry --reruns 2
+            ```
+
+            Ensure:
+            - [ ] Tests passed
+            - [ ] Tests failed
+            - [ ] No recent changes
+
+            If tests pass, please close this issue.

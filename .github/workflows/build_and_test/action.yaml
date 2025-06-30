@@ -1,0 +1,27 @@
+name: "Build and Test"
+description: "Cross-platoform build of terrytime."
+inputs:
+  build-type:
+    required: true
+    descriptions: "You must specify build type either Release or Debug."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up MSVC and vcpkg
+      uses: lukka/get-cmake@latest
+
+    - name: Setup anew (or from cache) vcpkg (and does not build any package)
+      uses: lukka/run-vcpkg@v11.3
+      with:
+        runVcpkgInstall: true
+
+    - name: Build and Test
+      uses: ashutoshvarma/action-cmake-build@master
+      with:
+        build-dir: ${{ runner.workspace }}/build
+        build-type: ${{ inputs.build-type }}
+        configure-options: -DBUILD_TESTS=ON
+        run-test: true
+        ctest-options: --output-on-failure
+        parallel: 14

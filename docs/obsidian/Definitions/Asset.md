@@ -1,0 +1,1 @@
+An **asset** is any resource with economic value that can be owned, traded, or invested, such as cryptocurrencies, stocks, commodities, or real estate.

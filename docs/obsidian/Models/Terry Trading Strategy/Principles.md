@@ -1,0 +1,6 @@
+The central idea of Terry Trading Strategy(TTS) is to get strict math model, which will take into aсcount as much potentially influencing on price change variables as possible.
+To achieve that process of developing strategy math model should be with following principles: 
+1. **No constants** - all parts of the math model must be derived by mathematical models. Exceptions are constants set by the platform(e.g. [[Trading platform fee|platform fee]]) or appearing by themselves when deriving formulas. 
+2. The development proceeds from the **general to the particular**. The initial point of the model development starts from the [[Central Formula]].
+3. All truly **unknown market variables** should be treated as [[Probability Distributions]] rather than fixed values, and all operations involving them should be performed accordingly using [[probabilistic methods]].
+4. All **manually defined** parameters (such as time intervals and limits) should be treated as functions optimized for performance rather than fixed values, with their optimal values determined through [[optimization methods]].

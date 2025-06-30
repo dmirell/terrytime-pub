@@ -1,0 +1,1 @@
+The secondary [[asset]] used to determine the price of the base asset (e.g., USDT in BTC/USDT).
