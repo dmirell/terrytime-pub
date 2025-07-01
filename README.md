@@ -11,8 +11,11 @@
 </div>
 
 # TerryTime
-[![Windows status](https://github.com/dmirell/terrytime/actions/workflows/windows-check.yaml/badge.svg)](https://github.com/dmirell/terrytime/actions/workflows/windows-check.yaml)
-[![Linux status](https://github.com/dmirell/terrytime/actions/workflows/ubuntu-check.yaml/badge.svg)](https://github.com/dmirell/terrytime/actions/workflows/ubuntu-check.yaml)
+[![Windows status](https://github.com/dmirell/terrytime-pub/actions/workflows/windows-check.yaml/badge.svg)](https://github.com/dmirell/terrytime-pub/actions/workflows/windows-check.yaml)
+[![Linux status](https://github.com/dmirell/terrytime-pub/actions/workflows/ubuntu-check.yaml/badge.svg)](https://github.com/dmirell/terrytime-pub/actions/workflows/ubuntu-check.yaml)
+
+## Description
+A modular platform for analyzing and reacting to Binance crypto pair traffic. Includes order book tracking, market emulation, benchmarking, and order execution — with future support for live trading integration.
 
 ## Content
 - [Usage](#usage)
@@ -48,8 +51,8 @@ terry orderbook test --symbol=BTCUSDT
 ## Build
 1. Clone repository using SSH
 ```bash
-git clone git@github.com:dmirell/terrytime.git
-cd terrytime
+git clone https://github.com/dmirell/terrytime-pub.git
+cd terrytime-pub
 ```
 2. Update submodules
 ```bash
@@ -82,4 +85,10 @@ ctest -C <release_type>
 ### Integration tests
 ```bash
 pytest ./integration -v --terry-path <path_to_terry_bin> --reruns 2
+```
+
+### Known problems
+For linux in case of error during fetching data try to source OPENSSL env variable to the built one via vcpkg:
+```bash
+source env.sh
 ```
